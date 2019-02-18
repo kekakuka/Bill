@@ -11,19 +11,21 @@ const  formatDate=(date)=> {
     if (day.length < 2) day = '0' + day;
     return [year, month, day].join('-');
 }
+let moneyStyle={color:'red'};
+let checked=true;
 export default class Create extends React.Component {
     constructor(){
         super();
         this.state={
             date:formatDate(new Date()),
-            category:"",
+            category:"Cost",
             money:"",
             notes:"",
             data:[]
         };
+
         this.handleDelete=this.handleDelete.bind(this);
     }
-
 
 
     componentWillMount(){
@@ -51,54 +53,74 @@ export default class Create extends React.Component {
             {date:e.target.value}
         )
     }
-    handleContentChange(e){
+    handleCategoryChange(e){
+
         this.setState(
-            {content:e.target.value}
+            {category:e.target.value}
+        );
+
+       if(e.target.value==="Income"){
+           moneyStyle={color:"green"};
+           checked=false;
+       }
+       else {
+           moneyStyle={color:"red"};
+           checked=true;
+       }
+
+    }
+    handleMoneyChange(e){
+        this.setState(
+            {money:e.target.value}
+        )
+    }
+    handleNotesChange(e){
+        this.setState(
+            {notes:e.target.value}
         )
     }
     handleSubmit(e){
         e.preventDefault();
+
         axios.post('/api/dailies',this.state);
         axios.get('/api/dailies').then(response=>{
             this.setState({
-                data:response.data
-            })
+                data:response.data,
+                money:"",notes:""
+            });
 
-        }).catch(error=>{console.log(error)})
-        this.setState(
-            {content:'',title:''}
-        )
+        }).catch(error=>{console.log(error)});
+        console.log(this.state);
     }
     render(){
-        let {data,date,money,category,notes}=this.state;
+        let {data,date,money,notes}=this.state;
+        console.log(data);
         return(
             <div>
                 <h2>Account </h2>
                 <div className="row">
                     <div className="thumbnail col-md-12" id="accordion">
-                                <form className="form-text" method="post">
+                                <form className="form-text"  onSubmit={this.handleSubmit.bind(this)}>
                                     <div className="form-group">
                                         <label>Date</label>
                                         <input  className="form-control" type="date" value={date} onChange={this.handleDateChange.bind(this)}/>
                                     </div>
-                                    <div className="form-group">
-                                                <label>Category:</label>
-                                           <label><input  name="Category" type="radio"  value="Cost"/>Cost</label>
-                                                    <label><input name="Category" type="radio"
-                                                                  value="Income"/>Income</label>
-
+                                    <div className="form-group" >
+                                                <label>  Category: </label>
+                                          <input  name="Category" type="radio" value="Cost" checked={checked}  onChange={this.handleCategoryChange.bind(this)}/>Cost
+                                                  <input  name="Category" type="radio" value="Income" checked={!checked} onChange={this.handleCategoryChange.bind(this)} />Income
                                     </div>
                                     <div className="form-group">
-                                        <label id="theLabelOfMoney" className="control-label">Money</label>
-                                        <input style={{color:'red'}} id="numberOfMoney" name="Money"
-                                               className="form-control"/>
+                                        <label id="theLabelOfMoney" className="control-label" >Money</label>
+                                        <input style={moneyStyle} id="numberOfMoney" name="Money" value={money}
+                                               onChange={this.handleMoneyChange.bind(this)}     className="form-control"/>
                                     </div>
                                     <div className="form-group">
                                         <label className="control-label">Notes</label>
-                                        <input name="Notes" className="form-control"/>
+                                        <input name="Notes" className="form-control" value={notes} onChange={this.handleNotesChange.bind(this)}/>
                                     </div>
                                     <div className="form-group">
-                                        <input type="submit" className="btn btn-default"/>
+                                        <input type="submit" className="btn btn-primary" />
                                     </div>
                                 </form>
 

@@ -12,28 +12,43 @@
 
 </head>
 <body>
-<div id="header" class="container-fluid">
+<div id="header" class="container-fluid"  >
     <div id="logo" class="pull-left">
         <h1><a href="">Account Book</a></h1>
     </div>
     <nav id="nav-menu-container">
         <ul class="nav-menu">
+                <!-- Authentication Links -->
+                @guest
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                    </li>
+                    @if (Route::has('register'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                        </li>
+                    @endif
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" role="button">
+                         Hi   {{ Auth::user()->username }}
+                        </a>
 
-            <li><a href="">Reports</a></li>
-            <li><a href="">Hi</a></li>
-            <li>
-                <form action="" method="post" id="logoutForm" class="navbar-right">
 
-                    <button type="submit" class="btn btn-link navbar-btn navbar-link">Log out</button>
-                </form>
-            </li>
+                    </li>   <li class="nav-item"> <a  href="{{ route('logout') }}"
+                               onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                    {{ __('Logout') }}
+                </a>
 
-            <li><a href="">Log in</a></li>
-            <li><a href="">Register</a></li>
-
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form> </li>
+                @endguest
         </ul>
     </nav>
 </div>
+<div style="margin-top: 100px"></div>
 @yield('content')
 
 <!--==========================

@@ -19,7 +19,8 @@ class DailyController extends Controller
      */
     public function index()
     {
-        $dailies = Daily::all();
+        $dailies = Daily::all()->sortByDesc('id');
+        $dailies= $dailies->values()->all();
        foreach ($dailies as $daily ){
         data_fill($daily, 'details', $daily->details);
         }
@@ -44,7 +45,47 @@ class DailyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $intDate=(int)str_replace('-','',$request->input('date'));
+
+        $theDaily=null;
+        $dailies=Daily::all();
+        foreach ($dailies as  $daily){
+            if($intDate===$daily->id){
+                $theDaily=$daily;
+                break;
+            }
+        }
+        if($theDaily===null){
+            $theDaily=new Daily([
+                'id'=>$intDate,
+                'user_id'=>1
+            ]);
+            $theDaily->save();
+        }
+        $isCost=false;
+        if($request->get('category')==='Cost'){
+            $isCost=true;
+        }
+
+        if($isCost){
+        $detail = new Detail([
+            'daily_id' => $intDate,
+            'Cost' => $request->input('money'),
+            'Notes' => $request->input('notes')
+        ]);
+            $this->ChangeAmount($detail->Cost,$detail);
+        }
+        else{
+            $detail = new Detail([
+                'daily_id' => $intDate,
+                'Income' => $request->input('money'),
+                'Notes' => $request->input('notes')
+            ]);
+            $this->ChangeAmount(-$detail->Income,$detail);
+        }
+        $detail->save();
+
+        return response()->json('Saved Successfully');
     }
 
     /**

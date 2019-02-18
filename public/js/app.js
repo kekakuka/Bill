@@ -59987,6 +59987,11 @@ var formatDate = function formatDate(date) {
   return [year, month, day].join('-');
 };
 
+var moneyStyle = {
+  color: 'red'
+};
+var checked = true;
+
 var Create =
 /*#__PURE__*/
 function (_React$Component) {
@@ -60000,7 +60005,7 @@ function (_React$Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Create).call(this));
     _this.state = {
       date: formatDate(new Date()),
-      category: "",
+      category: "Cost",
       money: "",
       notes: "",
       data: []
@@ -60046,10 +60051,36 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "handleContentChange",
-    value: function handleContentChange(e) {
+    key: "handleCategoryChange",
+    value: function handleCategoryChange(e) {
       this.setState({
-        content: e.target.value
+        category: e.target.value
+      });
+
+      if (e.target.value === "Income") {
+        moneyStyle = {
+          color: "green"
+        };
+        checked = false;
+      } else {
+        moneyStyle = {
+          color: "red"
+        };
+        checked = true;
+      }
+    }
+  }, {
+    key: "handleMoneyChange",
+    value: function handleMoneyChange(e) {
+      this.setState({
+        money: e.target.value
+      });
+    }
+  }, {
+    key: "handleNotesChange",
+    value: function handleNotesChange(e) {
+      this.setState({
+        notes: e.target.value
       });
     }
   }, {
@@ -60061,15 +60092,14 @@ function (_React$Component) {
       axios.post('/api/dailies', this.state);
       axios.get('/api/dailies').then(function (response) {
         _this4.setState({
-          data: response.data
+          data: response.data,
+          money: "",
+          notes: ""
         });
       }).catch(function (error) {
         console.log(error);
       });
-      this.setState({
-        content: '',
-        title: ''
-      });
+      console.log(this.state);
     }
   }, {
     key: "render",
@@ -60078,8 +60108,8 @@ function (_React$Component) {
           data = _this$state.data,
           date = _this$state.date,
           money = _this$state.money,
-          category = _this$state.category,
           notes = _this$state.notes;
+      console.log(data);
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", null, "Account "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -60087,7 +60117,7 @@ function (_React$Component) {
         id: "accordion"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
         className: "form-text",
-        method: "post"
+        onSubmit: this.handleSubmit.bind(this)
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Date"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
@@ -60097,25 +60127,29 @@ function (_React$Component) {
         onChange: this.handleDateChange.bind(this)
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Category:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "  Category: "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         name: "Category",
         type: "radio",
-        value: "Cost"
-      }), "Cost"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        value: "Cost",
+        checked: checked,
+        onChange: this.handleCategoryChange.bind(this)
+      }), "Cost", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         name: "Category",
         type: "radio",
-        value: "Income"
-      }), "Income")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        value: "Income",
+        checked: !checked,
+        onChange: this.handleCategoryChange.bind(this)
+      }), "Income"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         id: "theLabelOfMoney",
         className: "control-label"
       }, "Money"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
-        style: {
-          color: 'red'
-        },
+        style: moneyStyle,
         id: "numberOfMoney",
         name: "Money",
+        value: money,
+        onChange: this.handleMoneyChange.bind(this),
         className: "form-control"
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
@@ -60123,12 +60157,14 @@ function (_React$Component) {
         className: "control-label"
       }, "Notes"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         name: "Notes",
-        className: "form-control"
+        className: "form-control",
+        value: notes,
+        onChange: this.handleNotesChange.bind(this)
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "submit",
-        className: "btn btn-default"
+        className: "btn btn-primary"
       }))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Daily__WEBPACK_IMPORTED_MODULE_2__["default"], {
         data: data,
         handleDelete: this.handleDelete
@@ -60221,11 +60257,33 @@ function (_React$Component) {
     value: function render() {
       var _this = this;
 
+      var myStyle = {
+        'Notes': {
+          width: '40%'
+        },
+        'redMoney': {
+          width: '40%',
+          color: 'red'
+        },
+        'greenMoney': {
+          width: '40%',
+          color: 'green'
+        },
+        'Button': {
+          width: '20%'
+        }
+      };
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", null, "List"), this.props.data.map(function (daily) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
           key: daily.id,
           className: "table table-bordered"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, daily.id), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, daily.DailyTotal), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Delete"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, daily.details.map(function (detail) {
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+          style: myStyle.Notes
+        }, "Date: ", daily.id), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+          style: daily.DailyTotal < 0 ? myStyle.redMoney : myStyle.greenMoney
+        }, daily.DailyTotal), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+          style: myStyle.Button
+        }, "Delete The Detail"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, daily.details.map(function (detail) {
           return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
             key: detail.id
           }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, detail.Notes), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", {

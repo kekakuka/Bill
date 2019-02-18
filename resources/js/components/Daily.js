@@ -10,15 +10,16 @@ export default class Daily extends React.Component {
        this.props.handleDelete(detail)
     }
     render(){
+        let myStyle={'Notes':{width:'40%'},'redMoney':{width:'40%',color:'red'},'greenMoney':{width:'40%',color:'green'},'Button':{width:'20%'}};
+
         return(
         <div>
             <h2>List</h2>
 
                 {this.props.data.map((daily)=>(
-
                     <table key={daily.id} className="table table-bordered">
                         <thead>
-                        <tr ><th>{daily.id}</th><th>{daily.DailyTotal}</th><th>Delete</th></tr>
+                        <tr ><th style={myStyle.Notes}>Date: {daily.id}</th><th style={daily.DailyTotal<0?myStyle.redMoney:myStyle.greenMoney}>{daily.DailyTotal}</th><th style={myStyle.Button}>Delete The Detail</th></tr>
                         </thead>
                         <tbody>
                         {daily.details.map((detail)=>(
