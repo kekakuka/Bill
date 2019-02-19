@@ -11,11 +11,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $user=new \App\User(['username'=>'kekakuka',
-           'password'=>'123456'
-        ]);
-        $user->save();
-        $this->call(PostTableSeeder::class);
+//        $user=new \App\User(['username'=>'kekakuka',
+//           'password'=>'123456'
+//        ]);
+//        $user->save();
+      //  $this->call(PostTableSeeder::class);
 
 
     }

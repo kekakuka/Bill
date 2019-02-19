@@ -15,7 +15,7 @@ class CreateDetailsTable extends Migration
     {
         Schema::create('details', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('daily_id');
+            $table->string('daily_id');
             $table->foreign('daily_id')->references('id')->on('dailies');
             $table->unsignedDecimal('Cost',9,2)->default(0);
             $table->unsignedDecimal('Income',9,2)->default(0);

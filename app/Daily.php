@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Daily extends Model
 {
     protected $fillable = [
-        'user_id','id'
+        'user_id','id','TheDate'
     ];
     public function user()
     {

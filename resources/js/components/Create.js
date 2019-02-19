@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import Daily from './Daily'
 
+
+let user_id=document.getElementById('theUserId')?document.getElementById('theUserId').innerText:1;
+
 const  formatDate=(date)=> {
     var d = new Date(date),
         month = '' + (d.getMonth() + 1),
@@ -11,7 +14,7 @@ const  formatDate=(date)=> {
     if (day.length < 2) day = '0' + day;
     return [year, month, day].join('-');
 }
-let moneyStyle={color:'red'};
+let moneyStyle={color:'red',fontSize:'18px'};
 let checked=true;
 export default class Create extends React.Component {
     constructor(){
@@ -21,30 +24,39 @@ export default class Create extends React.Component {
             category:"Cost",
             money:"",
             notes:"",
-            data:[]
+            data:[],
+            user_id:user_id,
+            user_amount: 0,
+            moneyAlert:"",
+            notesAlert:"",
+            enter:"Submit"
         };
 
         this.handleDelete=this.handleDelete.bind(this);
     }
 
 
-    componentWillMount(){
-        axios.get('/api/dailies').then(response=>{
+    getApi(){
+        axios.get('/api/dailies/'+this.state.user_id).then(response=>{
             this.setState({
                 data:response.data
             });
         }).catch(error=>{console.log(error)})
 
+        axios.get('/api/users/'+this.state.user_id).then(response=>{
+            this.setState({
+                user_amount:response.data
+            });
+        }).catch(error=>{console.log(error)})
     }
+
+    componentWillMount(){
+       this.getApi();
+    }
+
     handleDelete(detail){
          axios.delete('/api/dailies/'+detail.id);
-
-        axios.get('/api/dailies').then(response=>{
-            this.setState({
-                data:response.data
-            });
-            console.log(response.data);
-        }).catch(error=>{console.log(error)})
+         this.getApi();
     }
 
 
@@ -54,73 +66,85 @@ export default class Create extends React.Component {
         )
     }
     handleCategoryChange(e){
-
         this.setState(
             {category:e.target.value}
         );
 
        if(e.target.value==="Income"){
-           moneyStyle={color:"green"};
+           moneyStyle={color:"green",fontSize:'18px'};
            checked=false;
        }
        else {
-           moneyStyle={color:"red"};
+           moneyStyle={color:"red",fontSize:'18px'};
            checked=true;
        }
 
     }
     handleMoneyChange(e){
+        if(Number(e.target.value)<1000000){
         this.setState(
-            {money:e.target.value}
-        )
+            {money:e.target.value,moneyAlert:"",  enter:"Submit"}
+        );
+        }
+        else {
+            this.setState(
+                { moneyAlert:"The number of Money is wrong",  enter:"Submit"}
+            );
+        }
     }
     handleNotesChange(e){
+        if(e.target.value.length<60){
         this.setState(
-            {notes:e.target.value}
-        )
+            {notes:e.target.value,notesAlert:"",  enter:"Submit"}
+        )}
+        else {
+            this.setState(
+                {notesAlert:"The Notes is to long",  enter:"Submit"}
+            )
+        }
     }
     handleSubmit(e){
         e.preventDefault();
-
+        if(Number.isNaN(Number(this.state.money))||Number(this.state.money)===0){
+            this.setState(
+                { moneyAlert:"The number of Money is wrong",  enter:"Submit"}
+            );
+            return;
+        }
         axios.post('/api/dailies',this.state);
-        axios.get('/api/dailies').then(response=>{
-            this.setState({
-                data:response.data,
-                money:"",notes:""
-            });
-
-        }).catch(error=>{console.log(error)});
-        console.log(this.state);
+        this.getApi();
+        this.setState({
+            money:"",notes:"", moneyAlert:"", notesAlert:"",enter:"The Detail Has Recorded",
+        });
     }
     render(){
-        let {data,date,money,notes}=this.state;
-        console.log(data);
+        let {data,date,money,notes,user_amount,moneyAlert,notesAlert,enter}=this.state;
         return(
             <div>
-                <h2>Account </h2>
+                <h2>Your Account  <span style={user_amount<0?{color:"red"}:{color:"green"}}>${user_amount}</span></h2>
                 <div className="row">
                     <div className="thumbnail col-md-12" id="accordion">
                                 <form className="form-text"  onSubmit={this.handleSubmit.bind(this)}>
                                     <div className="form-group">
-                                        <label>Date</label>
-                                        <input  className="form-control" type="date" value={date} onChange={this.handleDateChange.bind(this)}/>
+                                        <label style={{fontSize:'20px'}}>Date</label>
+                                        <input  style={{fontSize:'18px'}} className="form-control" type="date" value={date} onChange={this.handleDateChange.bind(this)}/>
                                     </div>
                                     <div className="form-group" >
-                                                <label>  Category: </label>
-                                          <input  name="Category" type="radio" value="Cost" checked={checked}  onChange={this.handleCategoryChange.bind(this)}/>Cost
-                                                  <input  name="Category" type="radio" value="Income" checked={!checked} onChange={this.handleCategoryChange.bind(this)} />Income
+                                                <label style={{fontSize:'20px'}}> Category: </label>
+                                        <label style={{marginLeft:'20px',fontSize:'20px'}} >     <input   name="Category" type="radio" value="Cost" checked={checked}  onChange={this.handleCategoryChange.bind(this)}/>Cost</label>
+                                        <label style={{marginLeft:'20px',fontSize:'20px'}}>   <input    name="Category" type="radio" value="Income" checked={!checked} onChange={this.handleCategoryChange.bind(this)} />Income</label>
                                     </div>
                                     <div className="form-group">
-                                        <label id="theLabelOfMoney" className="control-label" >Money</label>
-                                        <input style={moneyStyle} id="numberOfMoney" name="Money" value={money}
+                                        <label style={{fontSize:'20px'}} id="theLabelOfMoney" className="control-label" >Money <span style={{color:'red'}}>{moneyAlert}</span></label>
+                                        <input  style={moneyStyle} id="numberOfMoney" name="Money" value={money}
                                                onChange={this.handleMoneyChange.bind(this)}     className="form-control"/>
                                     </div>
                                     <div className="form-group">
-                                        <label className="control-label">Notes</label>
-                                        <input name="Notes" className="form-control" value={notes} onChange={this.handleNotesChange.bind(this)}/>
+                                        <label style={{fontSize:'20px'}} className="control-label">Notes <span style={{color:'red'}}>{notesAlert}</span></label>
+                                        <input style={{fontSize:'18px'}} name="Notes" className="form-control" value={notes} onChange={this.handleNotesChange.bind(this)}/>
                                     </div>
                                     <div className="form-group">
-                                        <input type="submit" className="btn btn-primary" />
+                                        <input  value={enter} type="submit" className="btn btn-primary" />
                                     </div>
                                 </form>
 

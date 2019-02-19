@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Daily;
 use App\Detail;
 use App\User;
+use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -17,16 +18,24 @@ class DailyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
-        $dailies = Daily::all()->sortByDesc('id');
-        $dailies= $dailies->values()->all();
+   $user=User::find($id);
+   $dailies=$user->dailies;
+      $dailies =  $dailies->sortByDesc('id');
+       $dailies= $dailies->values()->all();
        foreach ($dailies as $daily ){
         data_fill($daily, 'details', $daily->details);
         }
         return response()->json($dailies);
     }
 
+
+    public function showUserAmount($id){
+
+        $amount=User::find($id)->Amount;
+        return response()->json($amount);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -45,20 +54,36 @@ class DailyController extends Controller
      */
     public function store(Request $request)
     {
-        $intDate=(int)str_replace('-','',$request->input('date'));
 
+        $user_id=$request->input('user_id');
+        $long_id=$user_id;
+       if($user_id<10){
+           $long_id='10000'.$user_id;
+       }
+       elseif($user_id>9){
+           $long_id='1000'.$user_id;
+       }
+       elseif($user_id>99){
+           $long_id='100'.$user_id;
+       }
+       elseif($user_id>999){
+           $long_id='10'.$user_id;
+       }
+        $intDate=(int)str_replace('-','',$request->input('date'));
+        $int_id=$long_id.$intDate;
         $theDaily=null;
         $dailies=Daily::all();
         foreach ($dailies as  $daily){
-            if($intDate===$daily->id){
+            if( $int_id==$daily->id){
                 $theDaily=$daily;
                 break;
             }
         }
         if($theDaily===null){
             $theDaily=new Daily([
-                'id'=>$intDate,
-                'user_id'=>1
+                'id'=> $int_id,
+                'TheDate'=>$intDate,
+                'user_id'=>$user_id
             ]);
             $theDaily->save();
         }
@@ -69,7 +94,7 @@ class DailyController extends Controller
 
         if($isCost){
         $detail = new Detail([
-            'daily_id' => $intDate,
+            'daily_id' => $int_id,
             'Cost' => $request->input('money'),
             'Notes' => $request->input('notes')
         ]);
@@ -77,7 +102,7 @@ class DailyController extends Controller
         }
         else{
             $detail = new Detail([
-                'daily_id' => $intDate,
+                'daily_id' => $int_id,
                 'Income' => $request->input('money'),
                 'Notes' => $request->input('notes')
             ]);

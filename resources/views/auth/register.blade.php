@@ -44,16 +44,24 @@
                             </div>
                         </div>
                         <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                            <div class="col-md-1 offset-2">
+
+                            </div>
+                            <div class="col-md-7">
+                                <button type="submit" class="btn btn-primary btn-lg">
                                     {{ __('Register') }}
                                 </button>
+
+
+                                    <a style="margin-left: 70px;color: #1f6fb2;font-size: 17px;border-bottom: 1px double #1f6fb2" href="{{ route('login') }}">{{ __('Have Account to Login') }}</a>
+
                             </div>
                         </div>
+
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</div><div style="margin-top: 100px"></div>
 @endsection

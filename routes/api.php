@@ -16,5 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('dailies/{id}', 'Api\DailyController@index');
 Route::resource('dailies','Api\DailyController');
 Route::resource('posts','Api\PostController');
+Route::get('users/{id}','Api\DailyController@showUserAmount');

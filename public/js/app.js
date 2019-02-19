@@ -59976,6 +59976,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 
 
+var user_id = document.getElementById('theUserId') ? document.getElementById('theUserId').innerText : 1;
 
 var formatDate = function formatDate(date) {
   var d = new Date(date),
@@ -59988,7 +59989,8 @@ var formatDate = function formatDate(date) {
 };
 
 var moneyStyle = {
-  color: 'red'
+  color: 'red',
+  fontSize: '18px'
 };
 var checked = true;
 
@@ -60008,40 +60010,47 @@ function (_React$Component) {
       category: "Cost",
       money: "",
       notes: "",
-      data: []
+      data: [],
+      user_id: user_id,
+      user_amount: 0,
+      moneyAlert: "",
+      notesAlert: "",
+      enter: "Submit"
     };
     _this.handleDelete = _this.handleDelete.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
   _createClass(Create, [{
-    key: "componentWillMount",
-    value: function componentWillMount() {
+    key: "getApi",
+    value: function getApi() {
       var _this2 = this;
 
-      axios.get('/api/dailies').then(function (response) {
+      axios.get('/api/dailies/' + this.state.user_id).then(function (response) {
         _this2.setState({
           data: response.data
         });
       }).catch(function (error) {
         console.log(error);
       });
+      axios.get('/api/users/' + this.state.user_id).then(function (response) {
+        _this2.setState({
+          user_amount: response.data
+        });
+      }).catch(function (error) {
+        console.log(error);
+      });
+    }
+  }, {
+    key: "componentWillMount",
+    value: function componentWillMount() {
+      this.getApi();
     }
   }, {
     key: "handleDelete",
     value: function handleDelete(detail) {
-      var _this3 = this;
-
       axios.delete('/api/dailies/' + detail.id);
-      axios.get('/api/dailies').then(function (response) {
-        _this3.setState({
-          data: response.data
-        });
-
-        console.log(response.data);
-      }).catch(function (error) {
-        console.log(error);
-      });
+      this.getApi();
     }
   }, {
     key: "handleDateChange",
@@ -60059,12 +60068,14 @@ function (_React$Component) {
 
       if (e.target.value === "Income") {
         moneyStyle = {
-          color: "green"
+          color: "green",
+          fontSize: '18px'
         };
         checked = false;
       } else {
         moneyStyle = {
-          color: "red"
+          color: "red",
+          fontSize: '18px'
         };
         checked = true;
       }
@@ -60072,34 +60083,57 @@ function (_React$Component) {
   }, {
     key: "handleMoneyChange",
     value: function handleMoneyChange(e) {
-      this.setState({
-        money: e.target.value
-      });
+      if (Number(e.target.value) < 1000000) {
+        this.setState({
+          money: e.target.value,
+          moneyAlert: "",
+          enter: "Submit"
+        });
+      } else {
+        this.setState({
+          moneyAlert: "The number of Money is wrong",
+          enter: "Submit"
+        });
+      }
     }
   }, {
     key: "handleNotesChange",
     value: function handleNotesChange(e) {
-      this.setState({
-        notes: e.target.value
-      });
+      if (e.target.value.length < 60) {
+        this.setState({
+          notes: e.target.value,
+          notesAlert: "",
+          enter: "Submit"
+        });
+      } else {
+        this.setState({
+          notesAlert: "The Notes is to long",
+          enter: "Submit"
+        });
+      }
     }
   }, {
     key: "handleSubmit",
     value: function handleSubmit(e) {
-      var _this4 = this;
-
       e.preventDefault();
-      axios.post('/api/dailies', this.state);
-      axios.get('/api/dailies').then(function (response) {
-        _this4.setState({
-          data: response.data,
-          money: "",
-          notes: ""
+
+      if (Number.isNaN(Number(this.state.money)) || Number(this.state.money) === 0) {
+        this.setState({
+          moneyAlert: "The number of Money is wrong",
+          enter: "Submit"
         });
-      }).catch(function (error) {
-        console.log(error);
+        return;
+      }
+
+      axios.post('/api/dailies', this.state);
+      this.getApi();
+      this.setState({
+        money: "",
+        notes: "",
+        moneyAlert: "",
+        notesAlert: "",
+        enter: "The Detail Has Recorded"
       });
-      console.log(this.state);
     }
   }, {
     key: "render",
@@ -60108,9 +60142,18 @@ function (_React$Component) {
           data = _this$state.data,
           date = _this$state.date,
           money = _this$state.money,
-          notes = _this$state.notes;
-      console.log(data);
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", null, "Account "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          notes = _this$state.notes,
+          user_amount = _this$state.user_amount,
+          moneyAlert = _this$state.moneyAlert,
+          notesAlert = _this$state.notesAlert,
+          enter = _this$state.enter;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", null, "Your Account  ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        style: user_amount < 0 ? {
+          color: "red"
+        } : {
+          color: "green"
+        }
+      }, "$", user_amount)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "thumbnail col-md-12",
@@ -60120,31 +60163,59 @@ function (_React$Component) {
         onSubmit: this.handleSubmit.bind(this)
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Date"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        style: {
+          fontSize: '20px'
+        }
+      }, "Date"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        style: {
+          fontSize: '18px'
+        },
         className: "form-control",
         type: "date",
         value: date,
         onChange: this.handleDateChange.bind(this)
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "  Category: "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        style: {
+          fontSize: '20px'
+        }
+      }, " Category: "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        style: {
+          marginLeft: '20px',
+          fontSize: '20px'
+        }
+      }, "     ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         name: "Category",
         type: "radio",
         value: "Cost",
         checked: checked,
         onChange: this.handleCategoryChange.bind(this)
-      }), "Cost", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }), "Cost"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        style: {
+          marginLeft: '20px',
+          fontSize: '20px'
+        }
+      }, "   ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         name: "Category",
         type: "radio",
         value: "Income",
         checked: !checked,
         onChange: this.handleCategoryChange.bind(this)
-      }), "Income"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }), "Income")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        style: {
+          fontSize: '20px'
+        },
         id: "theLabelOfMoney",
         className: "control-label"
-      }, "Money"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, "Money ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        style: {
+          color: 'red'
+        }
+      }, moneyAlert)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         style: moneyStyle,
         id: "numberOfMoney",
         name: "Money",
@@ -60154,8 +60225,18 @@ function (_React$Component) {
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        style: {
+          fontSize: '20px'
+        },
         className: "control-label"
-      }, "Notes"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, "Notes ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        style: {
+          color: 'red'
+        }
+      }, notesAlert)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        style: {
+          fontSize: '18px'
+        },
         name: "Notes",
         className: "form-control",
         value: notes,
@@ -60163,6 +60244,7 @@ function (_React$Component) {
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        value: enter,
         type: "submit",
         className: "btn btn-primary"
       }))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Daily__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -60242,31 +60324,40 @@ function (_React$Component) {
   _inherits(Daily, _React$Component);
 
   function Daily(props) {
+    var _this;
+
     _classCallCheck(this, Daily);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(Daily).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Daily).call(this, props));
+    _this.state = {
+      buttonStyle: {
+        backgroundColor: ''
+      }
+    };
+    return _this;
   }
 
   _createClass(Daily, [{
     key: "deleteDetail",
     value: function deleteDetail(detail) {
+      document.getElementById('A00000' + detail.id).style.backgroundColor = 'pink';
       this.props.handleDelete(detail);
     }
   }, {
     key: "render",
     value: function render() {
-      var _this = this;
+      var _this2 = this;
 
       var myStyle = {
         'Notes': {
-          width: '40%'
+          width: '50%'
         },
         'redMoney': {
-          width: '40%',
+          width: '30%',
           color: 'red'
         },
         'greenMoney': {
-          width: '40%',
+          width: '30%',
           color: 'green'
         },
         'Button': {
@@ -60279,22 +60370,23 @@ function (_React$Component) {
           className: "table table-bordered"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
           style: myStyle.Notes
-        }, "Date: ", daily.id), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+        }, "Date: ", daily.TheDate), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
           style: daily.DailyTotal < 0 ? myStyle.redMoney : myStyle.greenMoney
-        }, daily.DailyTotal), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
+        }, "$", daily.DailyTotal), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
           style: myStyle.Button
         }, "Delete The Detail"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, daily.details.map(function (detail) {
           return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
+            id: 'A00000' + detail.id,
             key: detail.id
-          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, detail.Notes), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", {
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Notes: ", detail.Notes), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", {
             style: detail.Cost == 0 ? {
               color: 'green'
             } : {
               color: 'red'
             }
-          }, detail.Cost == 0 ? detail.Income : (-detail.Cost).toFixed(2)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+          }, "$", detail.Cost == 0 ? detail.Income : (-detail.Cost).toFixed(2)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
             className: "btn btn-danger",
-            onClick: _this.deleteDetail.bind(_this, detail)
+            onClick: _this2.deleteDetail.bind(_this2, detail)
           }, "Delete")));
         })));
       }));

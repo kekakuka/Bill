@@ -20,20 +20,13 @@
         <ul class="nav-menu">
                 <!-- Authentication Links -->
                 @guest
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                    </li>
-                    @if (Route::has('register'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                        </li>
-                    @endif
+
                 @else
                     <li class="nav-item">
                         <a class="nav-link" href="#" role="button">
                          Hi   {{ Auth::user()->username }}
-                        </a>
-
+                        </a><p style="display: none" id="theUserId">{{ Auth::user()->id }}</p>
+                        <p style="display: none" id="theUserAmount">{{ Auth::user()->Amount }}</p>
 
                     </li>   <li class="nav-item"> <a  href="{{ route('logout') }}"
                                onclick="event.preventDefault();
@@ -50,7 +43,7 @@
 </div>
 <div style="margin-top: 100px"></div>
 @yield('content')
-
+<div style="margin-top: 200px"></div>
 <!--==========================
   Footeraaa
 ============================-->
@@ -60,11 +53,10 @@
             <div class="row">
 
                 <div class=" col-md-12 footer-links">
-                    <h4>Links</h4>
+                    <h4>More Information</h4>
                     <ul>
-                        <li><i class="ion-ios-arrow-right"></i> <a href="#intro">About</a></li>
-                        <li><i class="ion-ios-arrow-right"></i> <a href="#portfolio">Projects</a></li>
-                        <li><i class="ion-ios-arrow-right"></i> <a href="#contact">Contact</a></li>
+                        <li> <a href="https://leili.fun">My Resume</a></li>
+                        <li>My Email: 39260972@qq.com</li>
                     </ul>
                 </div>
 
