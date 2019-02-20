@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Laravel 5.5 ReactJS CRUD Example</title>
+    <link rel="icon" type="image/ico" href="{{url('images/Logo1.ico')}}" sizes="16x16">
+    <title>Laravel-React Account Book</title>
     <link href="{{asset('css/app.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('css/site.css')}}" rel="stylesheet" type="text/css">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">

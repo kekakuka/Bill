@@ -24,7 +24,7 @@ export default class Create extends React.Component {
             category:"Cost",
             money:"",
             notes:"",
-            data:[],
+            data:null,
             user_id:user_id,
             user_amount: 0,
             moneyAlert:"",
@@ -34,8 +34,6 @@ export default class Create extends React.Component {
 
         this.handleDelete=this.handleDelete.bind(this);
     }
-
-
     getApi(){
         axios.get('/api/dailies/'+this.state.user_id).then(response=>{
             this.setState({
@@ -112,10 +110,11 @@ export default class Create extends React.Component {
             return;
         }
         axios.post('/api/dailies',this.state);
-        this.getApi();
         this.setState({
             money:"",notes:"", moneyAlert:"", notesAlert:"",enter:"The Detail Has Recorded",
         });
+        this.getApi();
+
     }
     render(){
         let {data,date,money,notes,user_amount,moneyAlert,notesAlert,enter}=this.state;
@@ -150,7 +149,7 @@ export default class Create extends React.Component {
 
                     </div>
                 </div>
-                <Daily data={data} handleDelete={this.handleDelete} />
+                {data?<Daily data={data} handleDelete={this.handleDelete} />:<div>Loading</div>}
             </div>
             // <div>
             // <h2>Create Post</h2>

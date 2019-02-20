@@ -60042,8 +60042,8 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "componentWillMount",
-    value: function componentWillMount() {
+    key: "componentDidMount",
+    value: function componentDidMount() {
       this.getApi();
     }
   }, {
@@ -60324,17 +60324,9 @@ function (_React$Component) {
   _inherits(Daily, _React$Component);
 
   function Daily(props) {
-    var _this;
-
     _classCallCheck(this, Daily);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Daily).call(this, props));
-    _this.state = {
-      buttonStyle: {
-        backgroundColor: ''
-      }
-    };
-    return _this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(Daily).call(this, props));
   }
 
   _createClass(Daily, [{
@@ -60346,7 +60338,7 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this = this;
 
       var myStyle = {
         'Notes': {
@@ -60364,7 +60356,8 @@ function (_React$Component) {
           width: '20%'
         }
       };
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", null, "List"), this.props.data.map(function (daily) {
+      var data = this.props.data;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h2", null, "List"), data ? data.map(function (daily) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
           key: daily.id,
           className: "table table-bordered"
@@ -60374,7 +60367,7 @@ function (_React$Component) {
           style: daily.DailyTotal < 0 ? myStyle.redMoney : myStyle.greenMoney
         }, "$", daily.DailyTotal), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", {
           style: myStyle.Button
-        }, "Delete The Detail"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, daily.details.map(function (detail) {
+        }, "Delete The Detail"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, daily.details ? daily.details.map(function (detail) {
           return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
             id: 'A00000' + detail.id,
             key: detail.id
@@ -60386,10 +60379,10 @@ function (_React$Component) {
             }
           }, "$", detail.Cost == 0 ? detail.Income : (-detail.Cost).toFixed(2)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
             className: "btn btn-danger",
-            onClick: _this2.deleteDetail.bind(_this2, detail)
+            onClick: _this.deleteDetail.bind(_this, detail)
           }, "Delete")));
-        })));
-      }));
+        }) : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Loding"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Loding"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Loding"))));
+      }) : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Loding"));
     }
   }]);
 

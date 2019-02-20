@@ -20,6 +20,7 @@ class DailyController extends Controller
      */
     public function index($id)
     {
+
    $user=User::find($id);
    $dailies=$user->dailies;
       $dailies =  $dailies->sortByDesc('id');
@@ -27,6 +28,8 @@ class DailyController extends Controller
        foreach ($dailies as $daily ){
         data_fill($daily, 'details', $daily->details);
         }
+
+
         return response()->json($dailies);
     }
 
